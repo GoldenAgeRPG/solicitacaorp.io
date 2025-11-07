@@ -69,6 +69,11 @@
       grid-template-columns: 1fr 1fr; 
       gap: 15px; 
     }
+    .grid-3 { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr 1fr; 
+      gap: 15px; 
+    }
     .input-group { 
       display: flex; 
       flex-direction: column; 
@@ -145,7 +150,7 @@
     }
     
     @media (max-width: 600px) {
-      .grid-2 { 
+      .grid-2, .grid-3 { 
         grid-template-columns: 1fr; 
       }
       body {
@@ -172,7 +177,7 @@
           </div>
         </div>
         
-        <div class="grid-2">
+        <div class="grid-3">
           <div class="input-group">
             <label for="f-tipo">Tipo de Atividade</label>
             <select id="f-tipo">
@@ -193,46 +198,41 @@
               <option value="Especial">Especial</option>
             </select>
           </div>
-        </div>
-        
-        <div class="input-group">
-          <label for="f-link">Link da Atividade</label>
-          <input type="url" id="f-link" placeholder="https://... (cole apenas a URL, será formatada automaticamente)">
-          <div class="note">Apenas cole a URL, o link será formatado automaticamente como "Clique aqui"</div>
+          <div class="input-group">
+            <label for="f-status-inimigos">Barra de Status Inimigos?</label>
+            <select id="f-status-inimigos">
+              <option value="Sim">Sim</option>
+              <option value="Não">Não</option>
+            </select>
+          </div>
         </div>
         
         <div class="input-group">
           <label for="f-participantes">Participantes</label>
           <input type="text" id="f-participantes" placeholder="Lista de jogadores participantes">
         </div>
-
-        <div class="input-group">
-          <label for="f-status-inimigos">Barra de Status dos Inimigos</label>
-          <textarea id="f-status-inimigos" placeholder="Descreva a barra de status dos inimigos (HP, Energia Amaldiçoada, etc)"></textarea>
-          <div class="note">Informe o status dos inimigos enfrentados na atividade</div>
-        </div>
         
         <div class="input-group">
           <label for="f-objetivo">Objetivo da Atividade</label>
-          <textarea id="f-objetivo" placeholder="Qual foi o objetivo principal desta atividade?"></textarea>
-          <div class="note">O que você pretendia alcançar com esta atividade</div>
+          <textarea id="f-objetivo" placeholder="Qual será o objetivo desta atividade? O que vocês pretendem alcançar?"></textarea>
+          <div class="note">Descreva o objetivo que vocês pretendem alcançar com esta atividade</div>
         </div>
 
         <div class="input-group">
           <label for="f-resumo">Resumo das Atividades Anteriores</label>
-          <textarea id="f-resumo" placeholder="Resumo do que aconteceu anteriormente na atividade"></textarea>
-          <div class="note">Descreva os eventos que ocorreram até o momento</div>
+          <textarea id="f-resumo" placeholder="O que os personagens fizeram ANTES de iniciar esta nova atividade?"></textarea>
+          <div class="note">Descreva o que aconteceu com os personagens antes desta atividade que está sendo solicitada</div>
         </div>
 
         <div class="input-group">
           <label for="f-roteiro">Sugestão de Roteiro</label>
-          <textarea id="f-roteiro" placeholder="Sua sugestão de como a atividade pode continuar"></textarea>
+          <textarea id="f-roteiro" placeholder="Sua sugestão de como a atividade pode se desenvolver"></textarea>
         </div>
 
         <div class="input-group">
           <label for="f-fichas">Links das Fichas dos Participantes</label>
-          <textarea id="f-fichas" placeholder="Cole um link por linha. Serão formatados automaticamente."></textarea>
-          <div class="note">Cole um link por linha. Cada link será formatado automaticamente como "[url]Nome do Personagem[/url]"</div>
+          <textarea id="f-fichas" placeholder="Cole um link por linha. Serão formatados automaticamente na mesma linha."></textarea>
+          <div class="note">Cole um link por linha. Os links serão formatados automaticamente e aparecerão na mesma linha, separados por vírgulas</div>
         </div>
       </fieldset>
     </div>
@@ -251,7 +251,7 @@
       const copyBtn = document.getElementById('copy-btn');
       const outputArea = document.getElementById('output-code');
       const allInputs = form.querySelectorAll('input, textarea, select');
-      const storageKey = 'pedidoAvaliacaoData_v2';
+      const storageKey = 'pedidoAvaliacaoData_v3';
 
       // --- FUNÇÕES UTILITÁRIAS ---
       function getVal(id) { 
@@ -276,7 +276,7 @@
         const linhas = texto.split('\n').filter(linha => linha.trim());
         if (linhas.length === 0) return 'Nenhum link fornecido';
         
-        return linhas.map(linha => {
+        const linksFormatados = linhas.map(linha => {
           const url = linha.trim();
           // Extrair nome do personagem da URL ou usar texto padrão
           let nome = 'Ficha';
@@ -295,7 +295,10 @@
           }
           
           return `[url=${url}]${nome}[/url]`;
-        }).join('\n');
+        });
+        
+        // Juntar todos os links na mesma linha, separados por vírgulas
+        return linksFormatados.join(', ');
       }
 
       // --- SISTEMA DE ALTURA DO IFRAME ---
@@ -319,17 +322,16 @@
           const personagem = escapeHTML(getVal('f-personagem'));
           const tipo = escapeHTML(getVal('f-tipo'));
           const grau = escapeHTML(getVal('f-grau'));
-          const link = escapeAttr(getVal('f-link'));
-          const participantes = escapeHTML(getVal('f-participantes'));
           const statusInimigos = escapeHTML(getVal('f-status-inimigos'));
+          const participantes = escapeHTML(getVal('f-participantes'));
           const objetivo = escapeHTML(getVal('f-objetivo'));
           const resumo = escapeHTML(getVal('f-resumo'));
           const roteiro = escapeHTML(getVal('f-roteiro'));
           const fichasTexto = getVal('f-fichas');
           const fichasFormatadas = processarLinksFichas(fichasTexto);
 
-          // Template atualizado com todos os campos
-          const codigoTemplate = `<link href="https://gaaaaaaaaabs.github.io/goldenagerepositor.io/combate.css" rel="stylesheet" type="text/css"> <div class="avaliacao-request"> <div class="avaliacao-header"> <div class="avaliacao-title"> <h3>PEDIDO DE AVALIAÇÃO</h3> <span class="avaliacao-status" data-status="1">Status: Aguardando Avaliação</span> </div> </div> <div class="avaliacao-content"> <div class="avaliacao-field"> <span class="avaliacao-label">Jogador:</span> <span class="avaliacao-value">${jogador || 'SeuNomeAqui'}</span> </div> <div class="avaliacao-field"> <span class="avaliacao-label">Personagem:</span> <span class="avaliacao-value">${personagem || 'NomeDoPersonagem'}</span> </div> <div class="avaliacao-field"> <span class="avaliacao-label">Tipo de Atividade:</span> <span class="avaliacao-value">${tipo || 'Tipo de Atividade'}</span> </div> <div class="avaliacao-field"> <span class="avaliacao-label">Grau/Nível:</span> <span class="avaliacao-value">${grau || 'Grau da Atividade'}</span> </div> <div class="avaliacao-field"> <span class="avaliacao-label">Link da Atividade:</span> <span class="avaliacao-value">${link ? '[url=' + link + ']Clique aqui[/url]' : 'Nenhum link fornecido'}</span> </div> <div class="avaliacao-field"> <span class="avaliacao-label">Participantes:</span> <span class="avaliacao-value">${participantes || 'Lista de participantes'}</span> </div> <div class="avaliacao-field full-width"> <span class="avaliacao-label">Barra de Status Inimigos:</span> <span class="avaliacao-value">${statusInimigos || 'Status dos inimigos não informado'}</span> </div> <div class="avaliacao-field full-width"> <span class="avaliacao-label">Objetivo da Atividade:</span> <span class="avaliacao-value">${objetivo || 'Objetivo da atividade...'}</span> </div> <div class="avaliacao-field full-width"> <span class="avaliacao-label">Resumo das Atividades Anteriores:</span> <span class="avaliacao-value">${resumo || 'Resumo das atividades anteriores...'}</span> </div> <div class="avaliacao-field full-width"> <span class="avaliacao-label">Sugestão de Roteiro:</span> <span class="avaliacao-value">${roteiro || 'Sugestão de roteiro não fornecida'}</span> </div> <div class="avaliacao-field full-width"> <span class="avaliacao-label">Fichas dos Participantes:</span> <span class="avaliacao-value">${fichasFormatadas}</span> </div> </div> <div class="avaliacao-footer"> <div class="avaliacao-master"> <b>Avaliador Responsável:</b> <span style="color: #82b1ff;">Aguardando designação</span> </div> <div class="avaliacao-notes"> <b>Feedback do Avaliador:</b> <span style="color: #82b1ff;">Aguardando avaliação.</span> </div> </div> </div> <style> .avaliacao-request { background: linear-gradient(135deg, #1a1a2e 0%, #0c0c1a 100%); border: 2px solid #2979ff; border-radius: 10px; margin: 15px 0; overflow: hidden; color: #e7e9ff; font-family: Arial, sans-serif; } .avaliacao-header { background: rgba(41, 121, 255, 0.2); padding: 15px 20px; border-bottom: 1px solid #333; } .avaliacao-title { display: flex; justify-content: space-between; align-items: center; } .avaliacao-title h3 { margin: 0; color: #82b1ff; font-size: 1.3em; } .avaliacao-status { background: #2979ff; color: white; padding: 5px 10px; border-radius: 4px; font-size: 0.9em; font-weight: bold; } .avaliacao-content { padding: 20px; } .avaliacao-field { display: flex; margin-bottom: 12px; align-items: flex-start; } .avaliacao-field.full-width { flex-direction: column; } .avaliacao-label { font-weight: bold; width: 140px; flex-shrink: 0; color: #bfc6e6; } .avaliacao-value { color: #82b1ff; flex: 1; } .avaliacao-field.full-width .avaliacao-value { margin-top: 5px; background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 4px; border-left: 3px solid #2979ff; white-space: pre-line; } .avaliacao-footer { background: rgba(0, 0, 0, 0.3); padding: 12px 20px; border-top: 1px solid #333; text-align: center; } .avaliacao-master { color: #bfc6e6; font-size: 0.95em; margin-bottom: 8px; } .avaliacao-notes { color: #bfc6e6; font-size: 0.95em; } </style>`;
+          // Template atualizado com todas as correções
+          const codigoTemplate = `<link href="https://gaaaaaaaaabs.github.io/goldenagerepositor.io/combate.css" rel="stylesheet" type="text/css"> <div class="avaliacao-request"> <div class="avaliacao-header"> <div class="avaliacao-title"> <h3>PEDIDO DE AVALIAÇÃO</h3> <span class="avaliacao-status" data-status="1">Status: Aguardando Avaliação</span> </div> </div> <div class="avaliacao-content"> <div class="avaliacao-field"> <span class="avaliacao-label">Jogador:</span> <span class="avaliacao-value">${jogador || 'SeuNomeAqui'}</span> </div> <div class="avaliacao-field"> <span class="avaliacao-label">Personagem:</span> <span class="avaliacao-value">${personagem || 'NomeDoPersonagem'}</span> </div> <div class="avaliacao-field"> <span class="avaliacao-label">Tipo de Atividade:</span> <span class="avaliacao-value">${tipo || 'Tipo de Atividade'}</span> </div> <div class="avaliacao-field"> <span class="avaliacao-label">Grau/Nível:</span> <span class="avaliacao-value">${grau || 'Grau da Atividade'}</span> </div> <div class="avaliacao-field"> <span class="avaliacao-label">Barra de Status Inimigos:</span> <span class="avaliacao-value">${statusInimigos || 'Não informado'}</span> </div> <div class="avaliacao-field"> <span class="avaliacao-label">Participantes:</span> <span class="avaliacao-value">${participantes || 'Lista de participantes'}</span> </div> <div class="avaliacao-field full-width"> <span class="avaliacao-label">Objetivo da Atividade:</span> <span class="avaliacao-value">${objetivo || 'Objetivo da atividade...'}</span> </div> <div class="avaliacao-field full-width"> <span class="avaliacao-label">Resumo das Atividades Anteriores:</span> <span class="avaliacao-value">${resumo || 'Resumo das atividades anteriores...'}</span> </div> <div class="avaliacao-field full-width"> <span class="avaliacao-label">Sugestão de Roteiro:</span> <span class="avaliacao-value">${roteiro || 'Sugestão de roteiro não fornecida'}</span> </div> <div class="avaliacao-field"> <span class="avaliacao-label">Fichas dos Participantes:</span> <span class="avaliacao-value">${fichasFormatadas}</span> </div> </div> <div class="avaliacao-footer"> <div class="avaliacao-master"> <b>Avaliador Responsável:</b> <span style="color: #82b1ff;">Aguardando designação</span> </div> <div class="avaliacao-notes"> <b>Feedback do Avaliador:</b> <span style="color: #82b1ff;">Aguardando avaliação.</span> </div> </div> </div> <style> .avaliacao-request { background: linear-gradient(135deg, #1a1a2e 0%, #0c0c1a 100%); border: 2px solid #2979ff; border-radius: 10px; margin: 15px 0; overflow: hidden; color: #e7e9ff; font-family: Arial, sans-serif; } .avaliacao-header { background: rgba(41, 121, 255, 0.2); padding: 15px 20px; border-bottom: 1px solid #333; } .avaliacao-title { display: flex; justify-content: space-between; align-items: center; } .avaliacao-title h3 { margin: 0; color: #82b1ff; font-size: 1.3em; } .avaliacao-status { background: #2979ff; color: white; padding: 5px 10px; border-radius: 4px; font-size: 0.9em; font-weight: bold; } .avaliacao-content { padding: 20px; } .avaliacao-field { display: flex; margin-bottom: 12px; align-items: flex-start; } .avaliacao-field.full-width { flex-direction: column; } .avaliacao-label { font-weight: bold; width: 140px; flex-shrink: 0; color: #bfc6e6; } .avaliacao-value { color: #82b1ff; flex: 1; } .avaliacao-field.full-width .avaliacao-value { margin-top: 5px; background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 4px; border-left: 3px solid #2979ff; } .avaliacao-footer { background: rgba(0, 0, 0, 0.3); padding: 12px 20px; border-top: 1px solid #333; text-align: center; } .avaliacao-master { color: #bfc6e6; font-size: 0.95em; margin-bottom: 8px; } .avaliacao-notes { color: #bfc6e6; font-size: 0.95em; } </style>`;
 
           outputArea.value = codigoTemplate;
         
