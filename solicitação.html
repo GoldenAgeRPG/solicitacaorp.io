@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerador de Solicitação de RP - JJK RPG</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Roboto+Mono:wght@400;700&family=Yuji+Syuku&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #0c0c1a;
+      --panel: #13141c;
+      --muted: #bfc6e6;
+      --accent1: #9b00ff;
+      --highlight: #c48fff;
+      --text: #e7e9ff;
+      --ui: 'Inter', system-ui, sans-serif;
+      --title: 'Yuji Syuku', serif;
+      --mono: 'Roboto Mono', monospace;
+      --glass: rgba(255, 255, 255, 0.03);
+      --glass-2: rgba(255, 255, 255, 0.02);
+      --success: #00e091;
+    }
+    body {
+      font-family: var(--ui);
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    #form-container {
+      background: var(--panel);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 20px;
+    }
+    #output-container {
+      margin-top: 20px;
+    }
+    fieldset {
+      border: 1px solid var(--glass);
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    legend {
+      font-family: var(--title);
+      font-size: 1.5em;
+      color: var(--highlight);
+      padding: 0 10px;
+      margin-left: 10px;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .input-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+    label { font-weight: 500; font-size: 13px; color: var(--muted); text-transform: uppercase; font-family: var(--mono); }
+    input[type="text"], input[type="url"], textarea, select {
+      background: var(--bg);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      padding: 10px;
+      color: var(--text);
+      font-family: var(--ui);
+      font-size: 14px;
+    }
+    select { font-family: var(--mono); }
+    textarea { min-height: 80px; resize: vertical; }
+    .note { font-size: 12px; color: var(--muted); opacity: 0.8; margin-top: -5px; margin-bottom: 10px; }
+    h4 {
+      font-family: var(--title);
+      color: var(--highlight);
+      border-bottom: 1px solid var(--glass-2);
+      padding-bottom: 5px;
+      margin-top: 15px;
+      margin-bottom: 10px;
+      font-size: 1.1em;
+    }
+    #output-code {
+      width: 100%;
+      height: 200px;
+      background: var(--bg);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 15px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 12px;
+      resize: vertical;
+      margin-bottom: 10px;
+    }
+    #copy-btn {
+      width: 100%; padding: 10px; border: none; border-radius: 8px; background: var(--success);
+      color: var(--panel); font-size: 1em; font-family: var(--ui); font-weight: 700;
+      cursor: pointer; transition: background 0.2s;
+    }
+    #copy-btn:hover { background: #00ffaa; }
+    
+    textarea::-webkit-scrollbar { width: 8px; }
+    textarea::-webkit-scrollbar-track { background: var(--panel); }
+    textarea::-webkit-scrollbar-thumb { background-color: var(--accent1); border-radius: 8px; }
+    
+    @media (max-width: 600px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <div id="form-container">
+      <fieldset>
+        <legend>Informações da Solicitação</legend>
+        <div class="grid-2">
+          <div class="input-group">
+            <label for="f-jogador">Jogador</label>
+            <input type="text" id="f-jogador" placeholder="Seu nome de usuário">
+          </div>
+          <div class="input-group">
+            <label for="f-personagem">Personagem</label>
+            <input type="text" id="f-personagem" placeholder="Nome do personagem">
+          </div>
+        </div>
+        
+        <div class="grid-2">
+          <div class="input-group">
+            <label for="f-tipo">Tipo de Atividade</label>
+            <select id="f-tipo">
+              <option value="Missão">Missão</option>
+              <option value="Quest">Quest</option>
+              <option value="Evento">Evento</option>
+              <option value="Treino Supervisionado">Treino Supervisionado</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="f-grau">Grau/Nível</label>
+            <select id="f-grau">
+              <option value="Grau 4">Grau 4</option>
+              <option value="Grau 3">Grau 3</option>
+              <option value="Grau 2">Grau 2</option>
+              <option value="Grau 1">Grau 1</option>
+              <option value="Semi-Especial">Semi-Especial</option>
+              <option value="Especial">Especial</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="grid-2">
+          <div class="input-group">
+            <label for="f-formato">Formato</label>
+            <select id="f-formato">
+              <option value="Autonarrado">Autonarrado</option>
+              <option value="Mestrado">Mestrado</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="f-barra-status">Barra de Status Inimigos</label>
+            <select id="f-barra-status">
+              <option value="Com Barra">Com Barra</option>
+              <option value="Sem Barra">Sem Barra</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="input-group">
+          <label for="f-objetivo">Objetivo</label>
+          <input type="text" id="f-objetivo" placeholder="O que se pretende alcançar com esta atividade">
+        </div>
+        
+        <div class="input-group">
+          <label for="f-participantes">Participantes</label>
+          <input type="text" id="f-participantes" placeholder="Lista de jogadores (se aplicável)">
+        </div>
+        
+        <div class="input-group">
+          <label for="f-descricao">Descrição</label>
+          <textarea id="f-descricao" placeholder="Breve descrição do enredo, contexto e desenvolvimento proposto para a atividade..."></textarea>
+        </div>
+      </fieldset>
+    </div>
+
+    <div id="output-container">
+      <textarea id="output-code" readonly>O código da sua solicitação aparecerá aqui...</textarea>
+      <button id="copy-btn">Copiar Código</button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      
+      const form = document.getElementById('form-container');
+      const copyBtn = document.getElementById('copy-btn');
+      const outputArea = document.getElementById('output-code');
+      const allInputs = form.querySelectorAll('input, textarea, select');
+      const storageKey = 'solicitacaoRPData_v1';
+
+      function getVal(id) { 
+        return document.getElementById(id).value.trim(); 
+      }
+      
+      function escapeHTML(str) { 
+        if (!str) return ''; 
+        return str.replace(/</g, "&lt;").replace(/>/g, "&gt;"); 
+      }
+      
+      function escapeAttr(str) { 
+        if (!str) return ''; 
+        return str.replace(/"/g, "&quot;"); 
+      }
+
+      function generateAndDisplayCode() {
+        try {
+          const jogador = escapeHTML(getVal('f-jogador'));
+          const personagem = escapeHTML(getVal('f-personagem'));
+          const tipo = escapeHTML(getVal('f-tipo'));
+          const grau = escapeHTML(getVal('f-grau'));
+          const objetivo = escapeHTML(getVal('f-objetivo'));
+          const formato = escapeHTML(getVal('f-formato'));
+          const barraStatus = escapeHTML(getVal('f-barra-status'));
+          const participantes = escapeHTML(getVal('f-participantes'));
+          const descricao = escapeHTML(getVal('f-descricao'));
+
+          // Código em linha única para o template filho
+          const codigoTemplate = `[div=background:linear-gradient(135deg,#1a1a2e 0%,#0c0c1a 100%);padding:20px;border-radius:10px;border:2px solid #9b00ff;margin:10px 0;font-family:Arial,sans-serif;color:#e7e9ff;][center][b][size=18][color=#c48fff]SOLICITAÇÃO DE ABERTURA[/color][/size][/b][/center][table width=100%][tr][td width=120][b]Jogador:[/b][/td][td][color=#c48fff]${jogador || 'SeuNomeAqui'}[/color][/td][/tr][tr][td][b]Personagem:[/b][/td][td][color=#c48fff]${personagem || 'NomeDoPersonagem'}[/color][/td][/tr][tr][td][b]Tipo:[/b][/td][td][color=#c48fff]${tipo || 'Missão/Quest/Evento'}[/color][/td][/tr][tr][td][b]Grau/Nível:[/b][/td][td][color=#c48fff]${grau || 'Grau 4/3/2/1 ou Especial'}[/color][/td][/tr][tr][td][b]Objetivo:[/b][/td][td][color=#c48fff]${objetivo || 'O que se pretende alcançar'}[/color][/td][/tr][tr][td][b]Formato:[/b][/td][td][color=#c48fff]${formato || 'Autonarrado/Mestrado'}[/color][/td][/tr][tr][td][b]Barra de Status Inimigos:[/b][/td][td][color=#c48fff]${barraStatus || 'Com Barra/Sem Barra'}[/color][/td][/tr][tr][td][b]Participantes:[/b][/td][td][color=#c48fff]${participantes || 'Lista de jogadores (se aplicável)'}[/color][/td][/tr][tr][td][b]Descrição:[/b][/td][td][color=#c48fff]${descricao || 'Breve descrição do enredo...'}[/color][/td][/tr][/table][hr][div=background:#1a1c33;padding:10px;border-radius:6px;text-align:center;][b]Status:[/b] [color=#ffab00]⏳ AGUARDANDO AVALIAÇÃO[/color][/div][div=background:rgba(155,0,255,0.1);padding:8px;border-radius:4px;margin-top:8px;font-size:12px;text-align:center;][b]Mestre Responsável:[/b] [color=#c48fff]Aguardando designação[/color][/div][/div]`;
+
+          outputArea.value = codigoTemplate;
+        
+        } catch (e) {
+          console.error("Erro ao gerar código:", e);
+          outputArea.value = "Erro! Verifique os valores do formulário.";
+        }
+      }
+      
+      function saveDataToLocalStorage() {
+        const data = {};
+        allInputs.forEach(input => {
+          if(input.id) {
+            data[input.id] = input.value;
+          }
+        });
+        localStorage.setItem(storageKey, JSON.stringify(data));
+      }
+
+      function loadDataFromLocalStorage() {
+        const data = JSON.parse(localStorage.getItem(storageKey));
+        if (data) {
+          allInputs.forEach(input => {
+            if (input.id && data[input.id] !== undefined) {
+              input.value = data[input.id];
+            }
+          });
+        }
+        generateAndDisplayCode();
+      }
+
+      // --- SCRIPT DE ALTURA DO IFRAME ---
+      function sendHeight() {
+        const newHeight = document.documentElement.scrollHeight;
+        window.parent.postMessage({ frameHeight: newHeight }, '*');
+      }
+
+      const resizeObserver = new ResizeObserver(entries => {
+        sendHeight();
+      });
+      resizeObserver.observe(document.body);
+      
+      // --- EVENT LISTENERS ---
+      loadDataFromLocalStorage();
+
+      form.addEventListener('input', function(event) {
+        generateAndDisplayCode();
+        saveDataToLocalStorage();
+        sendHeight(); 
+      });
+
+      copyBtn.addEventListener('click', function() {
+        outputArea.select();
+        document.execCommand('copy');
+        copyBtn.textContent = 'Copiado!';
+        setTimeout(() => {
+          copyBtn.textContent = 'Copiar Código';
+        }, 2000);
+      });
+      
+      sendHeight();
+
+    });
+  </script>
+</body>
+</html>
