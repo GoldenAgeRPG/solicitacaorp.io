@@ -261,7 +261,7 @@
         return str.replace(/"/g, "&quot;"); 
       }
 
-      // --- FUNÇÃO DE COMUNICAÇÃO COM O PAI ---
+      // --- SISTEMA DE COMUNICAÇÃO COM O PAI ---
       function sendHeightToParent() {
         const height = Math.max(
           document.body.scrollHeight, 
@@ -275,6 +275,13 @@
           frameHeight: height 
         }, 'https://goldenagerpg.github.io');
       }
+
+      // Escutar mensagens do pai
+      window.addEventListener('message', function(event) {
+        if (event.data === 'getHeight') {
+          sendHeightToParent();
+        }
+      });
 
       // --- GERAÇÃO DO CÓDIGO ---
       function generateAndDisplayCode() {
@@ -326,20 +333,13 @@
         generateAndDisplayCode();
       }
 
-      // --- OBSERVADOR DE REDIMENSIONAMENTO ---
+      // --- OBSERVADORES DE REDIMENSIONAMENTO ---
       const resizeObserver = new ResizeObserver(function() {
         sendHeightToParent();
       });
 
-      // --- COMUNICAÇÃO COM O PAI ---
-      window.addEventListener('message', function(event) {
-        if (event.data === 'getHeight') {
-          sendHeightToParent();
-        }
-      });
-
       // Observar mudanças no DOM
-      const observer = new MutationObserver(function() {
+      const mutationObserver = new MutationObserver(function() {
         sendHeightToParent();
       });
 
@@ -350,7 +350,7 @@
         
         // Configura observadores
         resizeObserver.observe(document.body);
-        observer.observe(document.body, {
+        mutationObserver.observe(document.body, {
           childList: true,
           subtree: true,
           attributes: true,
@@ -358,13 +358,13 @@
         });
         
         // Envia altura inicial
-        setTimeout(sendHeightToParent, 100);
+        setTimeout(sendHeightToParent, 500);
         
         // Configura eventos
         form.addEventListener('input', function() {
           generateAndDisplayCode();
           saveDataToLocalStorage();
-          setTimeout(sendHeightToParent, 50);
+          setTimeout(sendHeightToParent, 100);
         });
 
         copyBtn.addEventListener('click', function() {
@@ -379,7 +379,7 @@
         
         // Envia altura quando a janela é redimensionada
         window.addEventListener('resize', function() {
-          sendHeightToParent();
+          setTimeout(sendHeightToParent, 300);
         });
       }
 
