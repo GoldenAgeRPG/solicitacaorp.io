@@ -263,13 +263,19 @@
 
       // --- SISTEMA DE COMUNICAÇÃO COM O PAI ---
       function sendHeightToParent() {
+        // Método mais confiável para calcular altura
+        const body = document.body;
+        const html = document.documentElement;
+        
         const height = Math.max(
-          document.body.scrollHeight, 
-          document.body.offsetHeight,
-          document.documentElement.clientHeight,
-          document.documentElement.scrollHeight,
-          document.documentElement.offsetHeight
+          body.scrollHeight, 
+          body.offsetHeight,
+          html.clientHeight,
+          html.scrollHeight,
+          html.offsetHeight
         );
+        
+        console.log('Altura calculada:', height + 'px');
         
         window.parent.postMessage({ 
           frameHeight: height 
@@ -340,7 +346,7 @@
 
       // Observar mudanças no DOM
       const mutationObserver = new MutationObserver(function() {
-        sendHeightToParent();
+        setTimeout(sendHeightToParent, 100);
       });
 
       // --- INICIALIZAÇÃO ---
@@ -357,14 +363,16 @@
           attributeFilter: ['style', 'class']
         });
         
-        // Envia altura inicial
+        // Envia altura inicial com múltiplas tentativas
         setTimeout(sendHeightToParent, 500);
+        setTimeout(sendHeightToParent, 1500);
+        setTimeout(sendHeightToParent, 3000);
         
         // Configura eventos
         form.addEventListener('input', function() {
           generateAndDisplayCode();
           saveDataToLocalStorage();
-          setTimeout(sendHeightToParent, 100);
+          setTimeout(sendHeightToParent, 200);
         });
 
         copyBtn.addEventListener('click', function() {
