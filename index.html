@@ -32,7 +32,6 @@
       color: var(--text);
       line-height: 1.6;
       padding: 20px;
-      /* Garantir que o body ocupe pelo menos a tela toda */
       min-height: 100vh;
     }
     .container {
@@ -264,11 +263,9 @@
 
       // --- SISTEMA DE ALTURA DINÂMICA ---
       function calculateAndSendHeight() {
-        // Método mais confiável para obter a altura total do documento
         const body = document.body;
         const html = document.documentElement;
         
-        // Calcular a altura máxima entre várias propriedades
         const height = Math.max(
           body.scrollHeight, 
           body.offsetHeight,
@@ -277,20 +274,11 @@
           html.offsetHeight
         );
         
-        console.log('Altura calculada do iframe:', height + 'px');
-        
-        // Enviar altura EXATA para o pai
+        // [CORRIGIDO] Enviar a mensagem para a URL do seu fórum
         window.parent.postMessage({ 
           frameHeight: height 
-        }, 'https://goldenagerpg.github.io');
+        }, 'https://goldenagejjkrpg.forumeiros.com'); 
       }
-
-      // Escutar solicitações de altura do pai
-      window.addEventListener('message', function(event) {
-        if (event.data === 'getHeight') {
-          calculateAndSendHeight();
-        }
-      });
 
       // --- GERAÇÃO DO CÓDIGO ---
       function generateAndDisplayCode() {
@@ -305,7 +293,8 @@
           const participantes = escapeHTML(getVal('f-participantes'));
           const descricao = escapeHTML(getVal('f-descricao'));
 
-          const codigoTemplate = `<link href="https://gaaaaaaaaabs.github.io/goldenagerepositor.io/combate.css" rel="stylesheet" type="text/css"> <div class="solicitacao-request"> <div class="solicitacao-header"> <div class="solicitacao-title"> <h3>SOLICITAÇÃO DE ABERTURA</h3> <span class="solicitacao-status" data-status="1">Status: Pendente</span> </div> </div> <div class="solicitacao-content"> <div class="solicitacao-field"> <span class="solicitacao-label">Jogador:</span> <span class="solicitacao-value">${jogador || 'SeuNomeAqui'}</span> </div> <div class="solicitacao-field"> <span class="solicitacao-label">Personagem:</span> <span class="solicitacao-value">${personagem || 'NomeDoPersonagem'}</span> </div> <div class="solicitacao-field"> <span class="solicitacao-label">Tipo de Atividade:</span> <span class="solicitacao-value">${tipo || 'Missão/Quest/Evento'}</span> </div> <div class="solicitacao-field"> <span class="solicitacao-label">Grau/Nível:</span> <span class="solicitacao-value">${grau || 'Grau 4/3/2/1 ou Especial'}</span> </div> <div class="solicitacao-field"> <span class="solicitacao-label">Objetivo:</span> <span class="solicitacao-value">${objetivo || 'O que se pretende alcançar com esta atividade'}</span> </div> <div class="solicitacao-field"> <span class="solicitacao-label">Formato:</span> <span class="solicitacao-value">${formato || 'Autonarrado/Mestrado'}</span> </div> <div class="solicitacao-field"> <span class="solicitacao-label">Participantes:</span> <span class="solicitacao-value">${participantes || 'Lista de jogadores (se aplicável)'}</span> </div> <div class="solicitacao-field full-width"> <span class="solicitacao-label">Descrição:</span> <span class="solicitacao-value">${descricao || 'Breve descrição do enredo, contexto e desenvolvimento proposto para a atividade...'}</span> </div> </div> <div class="solicitacao-footer"> <div class="solicitacao-master"> <b>Mestre Responsável:</b> <span style="color: #c48fff;">Aguardando designação</span> </div> <div class="solicitacao-notes"> <b>Notas:</b> <span style="color: #c48fff;">Nenhuma nota.</span> </div> </div> </div> <style> .solicitacao-request { background: linear-gradient(135deg, #1a1a2e 0%, #0c0c1a 100%); border: 2px solid #9b00ff; border-radius: 10px; margin: 15px 0; overflow: hidden; color: #e7e9ff; font-family: Arial, sans-serif; } .solicitacao-header { background: rgba(155, 0, 255, 0.2); padding: 15px 20px; border-bottom: 1px solid #333; } .solicitacao-title { display: flex; justify-content: space-between; align-items: center; } .solicitacao-title h3 { margin: 0; color: #c48fff; font-size: 1.3em; } .solicitacao-status { background: #ffab00; color: white; padding: 5px 10px; border-radius: 4px; font-size: 0.9em; font-weight: bold; } .solicitacao-content { padding: 20px; } .solicitacao-field { display: flex; margin-bottom: 12px; align-items: flex-start; } .solicitacao-field.full-width { flex-direction: column; } .solicitacao-label { font-weight: bold; width: 140px; flex-shrink: 0; color: #bfc6e6; } .solicitacao-value { color: #c48fff; flex: 1; } .solicitacao-field.full-width .solicitacao-value { margin-top: 5px; background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 4px; border-left: 3px solid #9b00ff; } .solicitacao-footer { background: rgba(0, 0, 0, 0.3); padding: 12px 20px; border-top: 1px solid #333; text-align: center; } .solicitacao-master { color: #bfc6e6; font-size: 0.95em; margin-bottom: 8px; } .solicitacao-notes { color: #bfc6e6; font-size: 0.95em; } </style>`;
+          // [NOTA] O ?v=1.0 é um "cache buster" para garantir que o CSS atualize
+          const codigoTemplate = '<link href="https://gaaaaaaaaabs.github.io/goldenagerepositor.io/solicitacao.css?v=1.0" rel="stylesheet" type="text/css"><div class="solicitacao-request"><div class="solicitacao-header"><div class="solicitacao-title"><h3>SOLICITAÇÃO DE ABERTURA</h3><span class="solicitacao-status" data-status="1">Status: Pendente</span></div></div><div class="solicitacao-content"><div class="solicitacao-field"><span class="solicitacao-label">Jogador:</span><span class="solicitacao-value">' + (jogador || '...') + '</span></div><div class="solicitacao-field"><span class="solicitacao-label">Personagem:</span><span class="solicitacao-value">' + (personagem || '...') + '</span></div><div class="solicitacao-field"><span class="solicitacao-label">Tipo de Atividade:</span><span class="solicitacao-value">' + (tipo || '...') + '</span></div><div class="solicitacao-field"><span class="solicitacao-label">Grau/Nível:</span><span class="solicitacao-value">' + (grau || '...') + '</span></div><div class="solicitacao-field"><span class="solicitacao-label">Objetivo:</span><span class="solicitacao-value">' + (objetivo || '...') + '</span></div><div class="solicitacao-field"><span class="solicitacao-label">Formato:</span><span class="solicitacao-value">' + (formato || '...') + '</span></div><div class="solicitacao-field"><span class="solicitacao-label">Participantes:</span><span class="solicitacao-value">' + (participantes || '...') + '</span></div><div class="solicitacao-field full-width"><span class="solicitacao-label">Descrição:</span><span class="solicitacao-value">' + (descricao || '...') + '</span></div></div><div class="solicitacao-footer"><div class="solicitacao-master"><b>Mestre Responsável:</b><span style="color: #c48fff;"> Aguardando designação</span></div><div class="solicitacao-notes"><b>Notas:</b><span style="color: #c48fff;"> Nenhuma nota.</span></div></div></div>';
 
           outputArea.value = codigoTemplate;
         
@@ -342,22 +331,19 @@
         generateAndDisplayCode();
       }
 
-      // --- OBSERVADOR DE MUDANÇAS ---
+      // --- OBSERVADORES DE MUDANÇA ---
       const resizeObserver = new ResizeObserver(function() {
         calculateAndSendHeight();
       });
 
-      // Observar mudanças no DOM que possam alterar a altura
       const mutationObserver = new MutationObserver(function() {
         setTimeout(calculateAndSendHeight, 10);
       });
 
       // --- INICIALIZAÇÃO ---
       function initialize() {
-        // Carrega dados salvos
         loadDataFromLocalStorage();
         
-        // Configurar observadores
         resizeObserver.observe(document.body);
         mutationObserver.observe(document.body, {
           childList: true,
@@ -366,14 +352,11 @@
           attributeFilter: ['style', 'class']
         });
         
-        // Enviar altura inicial após um breve delay
         setTimeout(calculateAndSendHeight, 100);
         
-        // Configurar eventos
         form.addEventListener('input', function() {
           generateAndDisplayCode();
           saveDataToLocalStorage();
-          // Enviar nova altura após mudanças
           setTimeout(calculateAndSendHeight, 50);
         });
 
@@ -387,13 +370,11 @@
           }, 2000);
         });
         
-        // Recalcular altura em redimensionamentos
         window.addEventListener('resize', function() {
           setTimeout(calculateAndSendHeight, 100);
         });
       }
 
-      // Inicializar
       initialize();
 
     });
