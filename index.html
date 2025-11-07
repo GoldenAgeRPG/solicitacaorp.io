@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gerador de Solicitação de RP - JJK RPG</title>
+  <title>Gerador de Pedidos de Avaliação - JJK RPG</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Roboto+Mono:wght@400;700&family=Yuji+Syuku&display=swap" rel="stylesheet">
   
   <style>
@@ -11,8 +11,8 @@
       --bg: #0c0c1a;
       --panel: #13141c;
       --muted: #bfc6e6;
-      --accent1: #9b00ff;
-      --highlight: #c48fff;
+      --accent1: #2979ff;
+      --highlight: #82b1ff;
       --text: #e7e9ff;
       --ui: 'Inter', system-ui, sans-serif;
       --title: 'Yuji Syuku', serif;
@@ -160,7 +160,7 @@
     
     <div id="form-container">
       <fieldset>
-        <legend>Informações da Solicitação</legend>
+        <legend>Informações do Pedido</legend>
         <div class="grid-2">
           <div class="input-group">
             <label for="f-jogador">Jogador</label>
@@ -180,10 +180,11 @@
               <option value="Quest">Quest</option>
               <option value="Evento">Evento</option>
               <option value="Treino Supervisionado">Treino Supervisionado</option>
+              <option value="Desempenho Geral">Desempenho Geral</option>
             </select>
           </div>
           <div class="input-group">
-            <label for="f-grau">Grau/Nível</label>
+            <label for="f-grau">Grau/Nível da Atividade</label>
             <select id="f-grau">
               <option value="Grau 4">Grau 4</option>
               <option value="Grau 3">Grau 3</option>
@@ -195,42 +196,26 @@
           </div>
         </div>
         
-        <div class="grid-2">
-          <div class="input-group">
-            <label for="f-formato">Formato</label>
-            <select id="f-formato">
-              <option value="Autonarrado">Autonarrado</option>
-              <option value="Mestrado">Mestrado</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <label for="f-barra-status">Barra de Status Inimigos</label>
-            <select id="f-barra-status">
-              <option value="Com Barra">Com Barra</option>
-              <option value="Sem Barra">Sem Barra</option>
-            </select>
-          </div>
-        </div>
-        
         <div class="input-group">
-          <label for="f-objetivo">Objetivo</label>
-          <input type="text" id="f-objetivo" placeholder="O que se pretende alcançar com esta atividade">
+          <label for="f-link">Link da Atividade</label>
+          <input type="url" id="f-link" placeholder="https://... (cole apenas a URL, será formatada automaticamente)">
+          <div class="note">Apenas cole a URL, o link será formatado automaticamente como "Clique aqui"</div>
         </div>
         
         <div class="input-group">
           <label for="f-participantes">Participantes</label>
-          <input type="text" id="f-participantes" placeholder="Lista de jogadores (se aplicável)">
+          <input type="text" id="f-participantes" placeholder="Lista de jogadores participantes">
         </div>
         
         <div class="input-group">
-          <label for="f-descricao">Descrição</label>
-          <textarea id="f-descricao" placeholder="Breve descrição do enredo, contexto e desenvolvimento proposto para a atividade..."></textarea>
+          <label for="f-objetivo">Objetivo da Atividade</label>
+          <textarea id="f-objetivo" placeholder="Qual foi o objetivo principal desta atividade?"></textarea>
         </div>
       </fieldset>
     </div>
 
     <div id="output-container">
-      <textarea id="output-code" readonly>O código da sua solicitação aparecerá aqui...</textarea>
+      <textarea id="output-code" readonly>O código do seu pedido de avaliação aparecerá aqui...</textarea>
       <button id="copy-btn">Copiar Código</button>
     </div>
   </div>
@@ -243,7 +228,7 @@
       const copyBtn = document.getElementById('copy-btn');
       const outputArea = document.getElementById('output-code');
       const allInputs = form.querySelectorAll('input, textarea, select');
-      const storageKey = 'solicitacaoRPData_v1';
+      const storageKey = 'pedidoAvaliacaoData_v1';
 
       // --- FUNÇÕES UTILITÁRIAS ---
       function getVal(id) { 
@@ -261,18 +246,15 @@
         return str.replace(/"/g, "&quot;"); 
       }
 
-      // --- SISTEMA DE ALTURA DO IFRAME (CORRIGIDO) ---
-      const targetOrigin = 'https://goldenagejjkrpg.forumeiros.com'; // CORREÇÃO: domínio do fórum
+      // --- SISTEMA DE ALTURA DO IFRAME ---
+      const targetOrigin = 'https://goldenagejjkrpg.forumeiros.com';
       
       function sendHeight() {
         const newHeight = document.documentElement.scrollHeight;
         console.log('Enviando altura para o fórum:', newHeight + 'px');
-        
-        // CORREÇÃO: Enviar para o domínio do fórum, não para o github.io
         window.parent.postMessage({ frameHeight: newHeight }, targetOrigin);
       }
 
-      // Observar mudanças no tamanho
       const resizeObserver = new ResizeObserver(entries => {
         sendHeight();
       });
@@ -285,13 +267,12 @@
           const personagem = escapeHTML(getVal('f-personagem'));
           const tipo = escapeHTML(getVal('f-tipo'));
           const grau = escapeHTML(getVal('f-grau'));
-          const objetivo = escapeHTML(getVal('f-objetivo'));
-          const formato = escapeHTML(getVal('f-formato'));
-          const barraStatus = escapeHTML(getVal('f-barra-status'));
+          const link = escapeAttr(getVal('f-link'));
           const participantes = escapeHTML(getVal('f-participantes'));
-          const descricao = escapeHTML(getVal('f-descricao'));
+          const objetivo = escapeHTML(getVal('f-objetivo'));
 
-          const codigoTemplate = `<link href="https://gaaaaaaaaabs.github.io/goldenagerepositor.io/combate.css" rel="stylesheet" type="text/css"> <div class="solicitacao-request"> <div class="solicitacao-header"> <div class="solicitacao-title"> <h3>SOLICITAÇÃO DE ABERTURA</h3> <span class="solicitacao-status" data-status="1">Status: Pendente</span> </div> </div> <div class="solicitacao-content"> <div class="solicitacao-field"> <span class="solicitacao-label">Jogador:</span> <span class="solicitacao-value">${jogador || 'SeuNomeAqui'}</span> </div> <div class="solicitacao-field"> <span class="solicitacao-label">Personagem:</span> <span class="solicitacao-value">${personagem || 'NomeDoPersonagem'}</span> </div> <div class="solicitacao-field"> <span class="solicitacao-label">Tipo de Atividade:</span> <span class="solicitacao-value">${tipo || 'Missão/Quest/Evento'}</span> </div> <div class="solicitacao-field"> <span class="solicitacao-label">Grau/Nível:</span> <span class="solicitacao-value">${grau || 'Grau 4/3/2/1 ou Especial'}</span> </div> <div class="solicitacao-field"> <span class="solicitacao-label">Objetivo:</span> <span class="solicitacao-value">${objetivo || 'O que se pretende alcançar com esta atividade'}</span> </div> <div class="solicitacao-field"> <span class="solicitacao-label">Formato:</span> <span class="solicitacao-value">${formato || 'Autonarrado/Mestrado'}</span> </div> <div class="solicitacao-field"> <span class="solicitacao-label">Participantes:</span> <span class="solicitacao-value">${participantes || 'Lista de jogadores (se aplicável)'}</span> </div> <div class="solicitacao-field full-width"> <span class="solicitacao-label">Descrição:</span> <span class="solicitacao-value">${descricao || 'Breve descrição do enredo, contexto e desenvolvimento proposto para a atividade...'}</span> </div> </div> <div class="solicitacao-footer"> <div class="solicitacao-master"> <b>Mestre Responsável:</b> <span style="color: #c48fff;">Aguardando designação</span> </div> <div class="solicitacao-notes"> <b>Notas:</b> <span style="color: #c48fff;">Nenhuma nota.</span> </div> </div> </div> <style> .solicitacao-request { background: linear-gradient(135deg, #1a1a2e 0%, #0c0c1a 100%); border: 2px solid #9b00ff; border-radius: 10px; margin: 15px 0; overflow: hidden; color: #e7e9ff; font-family: Arial, sans-serif; } .solicitacao-header { background: rgba(155, 0, 255, 0.2); padding: 15px 20px; border-bottom: 1px solid #333; } .solicitacao-title { display: flex; justify-content: space-between; align-items: center; } .solicitacao-title h3 { margin: 0; color: #c48fff; font-size: 1.3em; } .solicitacao-status { background: #ffab00; color: white; padding: 5px 10px; border-radius: 4px; font-size: 0.9em; font-weight: bold; } .solicitacao-content { padding: 20px; } .solicitacao-field { display: flex; margin-bottom: 12px; align-items: flex-start; } .solicitacao-field.full-width { flex-direction: column; } .solicitacao-label { font-weight: bold; width: 140px; flex-shrink: 0; color: #bfc6e6; } .solicitacao-value { color: #c48fff; flex: 1; } .solicitacao-field.full-width .solicitacao-value { margin-top: 5px; background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 4px; border-left: 3px solid #9b00ff; } .solicitacao-footer { background: rgba(0, 0, 0, 0.3); padding: 12px 20px; border-top: 1px solid #333; text-align: center; } .solicitacao-master { color: #bfc6e6; font-size: 0.95em; margin-bottom: 8px; } .solicitacao-notes { color: #bfc6e6; font-size: 0.95em; } </style>`;
+          // Template com sistema de status e link formatado
+          const codigoTemplate = `<link href="https://gaaaaaaaaabs.github.io/goldenagerepositor.io/combate.css" rel="stylesheet" type="text/css"> <div class="avaliacao-request"> <div class="avaliacao-header"> <div class="avaliacao-title"> <h3>PEDIDO DE AVALIAÇÃO</h3> <span class="avaliacao-status" data-status="1">Status: Aguardando Avaliação</span> </div> </div> <div class="avaliacao-content"> <div class="avaliacao-field"> <span class="avaliacao-label">Jogador:</span> <span class="avaliacao-value">${jogador || 'SeuNomeAqui'}</span> </div> <div class="avaliacao-field"> <span class="avaliacao-label">Personagem:</span> <span class="avaliacao-value">${personagem || 'NomeDoPersonagem'}</span> </div> <div class="avaliacao-field"> <span class="avaliacao-label">Tipo de Atividade:</span> <span class="avaliacao-value">${tipo || 'Tipo de Atividade'}</span> </div> <div class="avaliacao-field"> <span class="avaliacao-label">Grau/Nível:</span> <span class="avaliacao-value">${grau || 'Grau da Atividade'}</span> </div> <div class="avaliacao-field"> <span class="avaliacao-label">Link da Atividade:</span> <span class="avaliacao-value">${link ? '[url=' + link + ']Clique aqui[/url]' : 'Nenhum link fornecido'}</span> </div> <div class="avaliacao-field"> <span class="avaliacao-label">Participantes:</span> <span class="avaliacao-value">${participantes || 'Lista de participantes'}</span> </div> <div class="avaliacao-field full-width"> <span class="avaliacao-label">Objetivo:</span> <span class="avaliacao-value">${objetivo || 'Objetivo da atividade...'}</span> </div> </div> <div class="avaliacao-footer"> <div class="avaliacao-master"> <b>Avaliador Responsável:</b> <span style="color: #82b1ff;">Aguardando designação</span> </div> <div class="avaliacao-notes"> <b>Feedback do Avaliador:</b> <span style="color: #82b1ff;">Aguardando avaliação.</span> </div> </div> </div> <style> .avaliacao-request { background: linear-gradient(135deg, #1a1a2e 0%, #0c0c1a 100%); border: 2px solid #2979ff; border-radius: 10px; margin: 15px 0; overflow: hidden; color: #e7e9ff; font-family: Arial, sans-serif; } .avaliacao-header { background: rgba(41, 121, 255, 0.2); padding: 15px 20px; border-bottom: 1px solid #333; } .avaliacao-title { display: flex; justify-content: space-between; align-items: center; } .avaliacao-title h3 { margin: 0; color: #82b1ff; font-size: 1.3em; } .avaliacao-status { background: #2979ff; color: white; padding: 5px 10px; border-radius: 4px; font-size: 0.9em; font-weight: bold; } .avaliacao-content { padding: 20px; } .avaliacao-field { display: flex; margin-bottom: 12px; align-items: flex-start; } .avaliacao-field.full-width { flex-direction: column; } .avaliacao-label { font-weight: bold; width: 140px; flex-shrink: 0; color: #bfc6e6; } .avaliacao-value { color: #82b1ff; flex: 1; } .avaliacao-field.full-width .avaliacao-value { margin-top: 5px; background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 4px; border-left: 3px solid #2979ff; } .avaliacao-footer { background: rgba(0, 0, 0, 0.3); padding: 12px 20px; border-top: 1px solid #333; text-align: center; } .avaliacao-master { color: #bfc6e6; font-size: 0.95em; margin-bottom: 8px; } .avaliacao-notes { color: #bfc6e6; font-size: 0.95em; } </style>`;
 
           outputArea.value = codigoTemplate;
         
